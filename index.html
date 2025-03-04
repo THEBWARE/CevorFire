@@ -1,57 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Upload</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    input[type="file"] {
-      margin: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload to Discord</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            overflow: hidden;
+        }
+
+        /* Upload Container */
+        .upload-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: scale(1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .upload-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: -1px;
+        }
+
+        /* File Input Styling */
+        .file-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #7289da;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(114, 137, 218, 0.3);
+        }
+
+        .file-label:hover {
+            background-color: #5b6eae;
+            transform: scale(1.05);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Upload Button */
+        .upload-button {
+            margin-top: 25px;
+            padding: 15px 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .upload-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Status Message */
+        #status {
+            margin-top: 25px;
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        /* Copy Button */
+        .copy-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: none;
+            font-size: 16px;
+            box-shadow: 0 5px 15px rgba(0, 140, 186, 0.3);
+        }
+
+        .copy-button:hover {
+            background-color: #007B9E;
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+    </style>
 </head>
 <body>
-  <h1>Upload a File</h1>
-  <input type="file" id="fileInput">
-  <button onclick="uploadFile()">Upload</button>
+    <div class="upload-container">
+        <h1>Upload a File</h1>
+        <label for="fileInput" class="file-label">Choose File</label>
+        <input type="file" id="fileInput">
+        <button class="upload-button" onclick="uploadFile()">Upload</button>
+        <p id="status"></p>
+        <button class="copy-button fade-in" onclick="copyUrl()">Copy File URL</button>
+    </div>
 
-  <script>
-    async function uploadFile() {
-      const fileInput = document.getElementById('fileInput');
-      const file = fileInput.files[0];
-      if (!file) {
-        alert('Please select a file.');
-        return;
-      }
+    <script>
+        let fileUrl = ""; // Variable to store the file URL
 
-      try {
-        // Fetch the Discord webhook URL from the private Pastebin link
-        const pastebinResponse = await fetch('https://pastebin.com/raw/p2VjdVkL');
-        const discordWebhookUrl = await pastebinResponse.text();
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('status');
+            const copyButton = document.querySelector('.copy-button');
 
-        // Create a FormData object to send the file
-        const formData = new FormData();
-        formData.append('file', file);
+            if (!fileInput.files[0]) {
+                status.textContent = "Please select a file first.";
+                return;
+            }
 
-        // Send the file to the Discord webhook (no-CORS request)
-        await fetch(discordWebhookUrl, {
-          method: 'POST',
-          body: formData,
-          mode: 'no-cors', // Bypass CORS restrictions
-        });
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
 
-        // Display a success message
-        alert('File uploaded successfully! Check your Discord channel for the download link.');
-      } catch (error) {
-        console.error('Error uploading file:', error);
-        alert('An error occurred while uploading the file.');
-      }
-    }
-  </script>
+            status.textContent = "Uploading...";
+
+            try {
+                // Replace with your Discord webhook URL
+                const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1346602706713837648/I2qyhACJKJhgVEKPc-RyhNBgzR0TM-hxuahXw6vvmnKzSDGmhkAUDgG-n28pT9GLBCUy';
+
+                // Send the file to the Discord webhook
+                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    fileUrl = data.attachments[0].url; // Store the file URL
+                    status.textContent = "File uploaded successfully!";
+                    copyButton.style.display = 'inline-block';
+                } else {
+                    status.textContent = "Failed to upload file.";
+                }
+            } catch (error) {
+                status.textContent = "An error occurred.";
+                console.error(error);
+            }
+        }
+
+        function copyUrl() {
+            if (!fileUrl) {
+                alert("No file URL available to copy.");
+                return;
+            }
+
+            // Modern method (navigator.clipboard)
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(fileUrl)
+                    .then(() => {
+                        alert("File URL copied to clipboard!");
+                    })
+                    .catch(() => {
+                        // Fallback to older method if modern method fails
+                        fallbackCopyText(fileUrl);
+                    });
+            } else {
+                // Fallback to older method
+                fallbackCopyText(fileUrl);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert("File URL copied to clipboard!");
+            } catch (err) {
+                alert("Failed to copy URL.");
+            }
+            document.body.removeChild(textarea);
+        }
+    </script>
 </body>
 </html>
