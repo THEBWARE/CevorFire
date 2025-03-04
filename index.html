@@ -36,30 +36,58 @@
         return;
       }
 
-      const formData = new FormData();
-      formData.append('file', file);
+      // Load obfuscated GitHub token from webhook.json
+      const response = await fetch('webhook.json');
+      const { githubToken } = await response.json();
 
-      try {
-        // Load webhook URL from webhook.json
-        const response = await fetch('webhook.json');
-        const { webhookUrl } = await response.json();
+      // Decode the token (e.g., Base64 decode)
+      const decodedToken = atob(githubToken);
 
-        // Send file to Discord webhook
-        const discordResponse = await fetch(webhookUrl, {
-          method: 'POST',
-          body: formData,
-        });
-        const discordData = await discordResponse.json();
+      // Generate a random filename
+      const randomFilename = Math.random().toString(36).substring(2, 15) + '.html';
 
-        if (discordData.attachments && discordData.attachments.length > 0) {
-          const downloadLink = document.getElementById('link');
-          downloadLink.href = discordData.attachments[0].url;
-          document.getElementById('downloadLink').style.display = 'block';
-        } else {
-          alert('Failed to upload file to Discord.');
+      // Read the file content
+      const fileContent = await file.text();
+
+      // Create the HTML file content
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Download File</title>
+        </head>
+        <body>
+          <h1>Download Your File</h1>
+          <a href="${URL.createObjectURL(file)}" download="${file.name}">Click here to download</a>
+        </body>
+        </html>
+      `;
+
+      // Upload the HTML file to GitHub
+      const uploadResponse = await fetch(
+        `https://api.github.com/repos/YOUR_GITHUB_USERNAME/CevorFire/contents/${randomFilename}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${decodedToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: 'Add new download file',
+            content: btoa(htmlContent), // Base64 encode the content
+          }),
         }
-      } catch (error) {
-        console.error('Error uploading file:', error);
+      );
+
+      const uploadData = await uploadResponse.json();
+      if (uploadData.content) {
+        const downloadLink = document.getElementById('link');
+        downloadLink.href = uploadData.content.html_url;
+        document.getElementById('downloadLink').style.display = 'block';
+      } else {
+        alert('Failed to upload file to GitHub.');
       }
     }
   </script>
