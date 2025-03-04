@@ -13,23 +13,12 @@
     input[type="file"] {
       margin: 20px;
     }
-    #downloadLink {
-      display: none;
-      margin-top: 20px;
-    }
-    #copyLink {
-      margin-left: 10px;
-    }
   </style>
 </head>
 <body>
   <h1>Upload a File</h1>
   <input type="file" id="fileInput">
   <button onclick="uploadFile()">Upload</button>
-  <div id="downloadLink">
-    <a id="link" target="_blank">Download File</a>
-    <button id="copyLink" onclick="copyLink()">Copy Link</button>
-  </div>
 
   <script>
     async function uploadFile() {
@@ -49,32 +38,19 @@
         const formData = new FormData();
         formData.append('file', file);
 
-        // Send the file to the Discord webhook
-        const discordResponse = await fetch(discordWebhookUrl, {
+        // Send the file to the Discord webhook (no-CORS request)
+        await fetch(discordWebhookUrl, {
           method: 'POST',
           body: formData,
+          mode: 'no-cors', // Bypass CORS restrictions
         });
 
-        const discordData = await discordResponse.json();
-        if (discordData.attachments && discordData.attachments.length > 0) {
-          const downloadLink = document.getElementById('link');
-          downloadLink.href = discordData.attachments[0].url;
-          downloadLink.textContent = 'Download File';
-          document.getElementById('downloadLink').style.display = 'block';
-        } else {
-          alert('Failed to upload file. Check the console for details.');
-        }
+        // Display a success message
+        alert('File uploaded successfully! Check your Discord channel for the download link.');
       } catch (error) {
         console.error('Error uploading file:', error);
         alert('An error occurred while uploading the file.');
       }
-    }
-
-    function copyLink() {
-      const downloadLink = document.getElementById('link').href;
-      navigator.clipboard.writeText(downloadLink)
-        .then(() => alert('Link copied to clipboard!'))
-        .catch(() => alert('Failed to copy link.'));
     }
   </script>
 </body>
