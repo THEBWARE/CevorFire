@@ -22,35 +22,60 @@
 <body>
   <h1>Upload a File</h1>
   <input type="file" id="fileInput">
+  <button onclick="generateDownloadLink()">Generate Download Link</button>
   <div id="downloadLink">
-    <a id="link">Download Current File</a>
+    <a id="link">Download HTML File</a>
   </div>
 
   <script>
-    const fileInput = document.getElementById('fileInput');
-    const downloadLink = document.getElementById('link');
-
-    fileInput.addEventListener('change', () => {
+    function generateDownloadLink() {
+      const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
       if (!file) {
         alert('Please select a file.');
         return;
       }
 
-      // Create a Blob URL for the file
-      const fileUrl = URL.createObjectURL(file);
+      // Read the file content
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const fileContent = event.target.result;
 
-      // Set the download link
-      downloadLink.href = fileUrl;
-      downloadLink.download = file.name; // Set the download filename
-      document.getElementById('downloadLink').style.display = 'block';
+        // Create the HTML file content
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Downloaded File</title>
+          </head>
+          <body>
+            <h1>Downloaded File</h1>
+            <p>Here is the content of the file you uploaded:</p>
+            <pre>${fileContent}</pre>
+          </body>
+          </html>
+        `;
 
-      // Optional: Log the file details
-      console.log('File Name:', file.name);
-      console.log('File Size:', file.size, 'bytes');
-      console.log('File Type:', file.type);
-      console.log('Download Link:', fileUrl);
-    });
+        // Create a Blob URL for the HTML file
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const fileUrl = URL.createObjectURL(blob);
+
+        // Set the download link
+        const downloadLink = document.getElementById('link');
+        downloadLink.href = fileUrl;
+        downloadLink.download = 'downloaded_file.html'; // Set the download filename
+        document.getElementById('downloadLink').style.display = 'block';
+
+        // Optional: Log the file details
+        console.log('File Name:', file.name);
+        console.log('File Size:', file.size, 'bytes');
+        console.log('File Type:', file.type);
+        console.log('Download Link:', fileUrl);
+      };
+      reader.readAsText(file); // Read the file as text
+    }
   </script>
 </body>
 </html>
