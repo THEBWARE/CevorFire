@@ -42,6 +42,7 @@
 
       // Decode the token (e.g., Base64 decode)
       const decodedToken = atob(githubToken);
+      console.log('Decoded GitHub Token:', decodedToken);
 
       // Generate a random filename
       const randomFilename = Math.random().toString(36).substring(2, 15) + '.html';
@@ -65,9 +66,16 @@
         </html>
       `;
 
+      // Base64 encode the content
+      const base64Content = btoa(htmlContent);
+      console.log('Base64 Encoded Content:', base64Content);
+
       // Upload the HTML file to GitHub
+      const uploadUrl = `https://api.github.com/repos/THEBWARE/CevorFire/contents/${randomFilename}`;
+      console.log('Upload URL:', uploadUrl);
+
       const uploadResponse = await fetch(
-        `https://api.github.com/repos/THEBWARE/CevorFire/contents/${randomFilename}`,
+        uploadUrl,
         {
           method: 'PUT',
           headers: {
@@ -76,18 +84,20 @@
           },
           body: JSON.stringify({
             message: 'Add new download file',
-            content: btoa(htmlContent), // Base64 encode the content
+            content: base64Content,
           }),
         }
       );
 
       const uploadData = await uploadResponse.json();
+      console.log('GitHub API Response:', uploadData);
+
       if (uploadData.content) {
         const downloadLink = document.getElementById('link');
         downloadLink.href = uploadData.content.html_url;
         document.getElementById('downloadLink').style.display = 'block';
       } else {
-        alert('Failed to upload file to GitHub.');
+        alert('Failed to upload file to GitHub. Check the console for details.');
       }
     }
   </script>
