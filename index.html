@@ -22,14 +22,15 @@
 <body>
   <h1>Upload a File</h1>
   <input type="file" id="fileInput">
-  <button onclick="uploadFile()">Upload</button>
   <div id="downloadLink">
-    <a id="link" target="_blank">Download your file here</a>
+    <a id="link">Download Current File</a>
   </div>
 
   <script>
-    async function uploadFile() {
-      const fileInput = document.getElementById('fileInput');
+    const fileInput = document.getElementById('fileInput');
+    const downloadLink = document.getElementById('link');
+
+    fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
       if (!file) {
         alert('Please select a file.');
@@ -39,8 +40,7 @@
       // Create a Blob URL for the file
       const fileUrl = URL.createObjectURL(file);
 
-      // Display the download link
-      const downloadLink = document.getElementById('link');
+      // Set the download link
       downloadLink.href = fileUrl;
       downloadLink.download = file.name; // Set the download filename
       document.getElementById('downloadLink').style.display = 'block';
@@ -50,7 +50,7 @@
       console.log('File Size:', file.size, 'bytes');
       console.log('File Type:', file.type);
       console.log('Download Link:', fileUrl);
-    }
+    });
   </script>
 </body>
 </html>
