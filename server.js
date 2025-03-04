@@ -5,8 +5,9 @@ const PORT = process.env.PORT || 3000;
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Allow all origins
+  res.header('Access-Control-Allow-Origin', 'https://thebware.github.io'); // Allow only your GitHub Pages domain
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); // Allow specific HTTP methods
   next();
 });
 
