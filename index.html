@@ -17,18 +17,22 @@
       display: none;
       margin-top: 20px;
     }
+    #copyLink {
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
   <h1>Upload a File</h1>
   <input type="file" id="fileInput">
-  <button onclick="generateDownloadLink()">Generate Download Link</button>
+  <button onclick="uploadFile()">Upload</button>
   <div id="downloadLink">
-    <a id="link">Download HTML File</a>
+    <a id="link" target="_blank">Download File</a>
+    <button id="copyLink" onclick="copyLink()">Copy Link</button>
   </div>
 
   <script>
-    function generateDownloadLink() {
+    async function uploadFile() {
       const fileInput = document.getElementById('fileInput');
       const file = fileInput.files[0];
       if (!file) {
@@ -36,45 +40,41 @@
         return;
       }
 
-      // Read the file content
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const fileContent = event.target.result;
+      try {
+        // Fetch the Discord webhook URL from the private Pastebin link
+        const pastebinResponse = await fetch('https://pastebin.com/raw/p2VjdVkL');
+        const discordWebhookUrl = await pastebinResponse.text();
 
-        // Create the HTML file content
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Downloaded File</title>
-          </head>
-          <body>
-            <h1>Downloaded File</h1>
-            <p>Here is the content of the file you uploaded:</p>
-            <pre>${fileContent}</pre>
-          </body>
-          </html>
-        `;
+        // Create a FormData object to send the file
+        const formData = new FormData();
+        formData.append('file', file);
 
-        // Create a Blob URL for the HTML file
-        const blob = new Blob([htmlContent], { type: 'text/html' });
-        const fileUrl = URL.createObjectURL(blob);
+        // Send the file to the Discord webhook
+        const discordResponse = await fetch(discordWebhookUrl, {
+          method: 'POST',
+          body: formData,
+        });
 
-        // Set the download link
-        const downloadLink = document.getElementById('link');
-        downloadLink.href = fileUrl;
-        downloadLink.download = 'downloaded_file.html'; // Set the download filename
-        document.getElementById('downloadLink').style.display = 'block';
+        const discordData = await discordResponse.json();
+        if (discordData.attachments && discordData.attachments.length > 0) {
+          const downloadLink = document.getElementById('link');
+          downloadLink.href = discordData.attachments[0].url;
+          downloadLink.textContent = 'Download File';
+          document.getElementById('downloadLink').style.display = 'block';
+        } else {
+          alert('Failed to upload file. Check the console for details.');
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('An error occurred while uploading the file.');
+      }
+    }
 
-        // Optional: Log the file details
-        console.log('File Name:', file.name);
-        console.log('File Size:', file.size, 'bytes');
-        console.log('File Type:', file.type);
-        console.log('Download Link:', fileUrl);
-      };
-      reader.readAsText(file); // Read the file as text
+    function copyLink() {
+      const downloadLink = document.getElementById('link').href;
+      navigator.clipboard.writeText(downloadLink)
+        .then(() => alert('Link copied to clipboard!'))
+        .catch(() => alert('Failed to copy link.'));
     }
   </script>
 </body>
