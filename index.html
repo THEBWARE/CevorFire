@@ -87,9 +87,27 @@
             transform: scale(1.05);
         }
 
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 10px;
+            background-color: #7289da;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
         /* Status Message */
         #status {
-            margin-top: 25px;
+            margin-top: 20px;
             font-weight: bold;
             color: #333;
             font-size: 16px;
@@ -132,6 +150,9 @@
         <label for="fileInput" class="file-label">Choose File</label>
         <input type="file" id="fileInput">
         <button class="upload-button" onclick="uploadFile()">Upload</button>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
         <p id="status"></p>
         <button class="copy-button fade-in" onclick="copyUrl()">Copy File URL</button>
     </div>
@@ -143,6 +164,8 @@
             const fileInput = document.getElementById('fileInput');
             const status = document.getElementById('status');
             const copyButton = document.querySelector('.copy-button');
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.querySelector('.progress-bar');
 
             if (!fileInput.files[0]) {
                 status.textContent = "Please select a file first.";
@@ -154,6 +177,8 @@
             formData.append('file', file);
 
             status.textContent = "Uploading...";
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
 
             try {
                 // Replace with your Discord webhook URL
@@ -176,6 +201,8 @@
             } catch (error) {
                 status.textContent = "An error occurred.";
                 console.error(error);
+            } finally {
+                progressContainer.style.display = 'none';
             }
         }
 
