@@ -36,32 +36,20 @@
         return;
       }
 
-      // Read the file content
-      const fileContent = await file.text();
+      // Create a Blob URL for the file
+      const fileUrl = URL.createObjectURL(file);
 
-      // Send the file to the backend proxy
-      const backendUrl = 'https://your-backend-proxy.com/upload'; // Replace with your backend URL
-      const uploadResponse = await fetch(backendUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fileContent: URL.createObjectURL(file),
-          fileName: file.name,
-        }),
-      });
+      // Display the download link
+      const downloadLink = document.getElementById('link');
+      downloadLink.href = fileUrl;
+      downloadLink.download = file.name; // Set the download filename
+      document.getElementById('downloadLink').style.display = 'block';
 
-      const uploadData = await uploadResponse.json();
-      console.log('Backend Response:', uploadData);
-
-      if (uploadData.download_link) {
-        const downloadLink = document.getElementById('link');
-        downloadLink.href = uploadData.download_link;
-        document.getElementById('downloadLink').style.display = 'block';
-      } else {
-        alert('Failed to upload file to GitHub. Check the console for details.');
-      }
+      // Optional: Log the file details
+      console.log('File Name:', file.name);
+      console.log('File Size:', file.size, 'bytes');
+      console.log('File Type:', file.type);
+      console.log('Download Link:', fileUrl);
     }
   </script>
 </body>
