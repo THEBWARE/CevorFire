@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input[type="file"] {
+      margin: 20px;
+    }
+    #downloadLink {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload a File</h1>
+  <input type="file" id="fileInput">
+  <button onclick="uploadFile()">Upload</button>
+  <div id="downloadLink">
+    <a id="link" target="_blank">Download your file here</a>
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select a file.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        // Load webhook URL from webhook.json
+        const response = await fetch('webhook.json');
+        const { webhookUrl } = await response.json();
+
+        // Send file to Discord webhook
+        const discordResponse = await fetch(webhookUrl, {
+          method: 'POST',
+          body: formData,
+        });
+        const discordData = await discordResponse.json();
+
+        if (discordData.attachments && discordData.attachments.length > 0) {
+          const downloadLink = document.getElementById('link');
+          downloadLink.href = discordData.attachments[0].url;
+          document.getElementById('downloadLink').style.display = 'block';
+        } else {
+          alert('Failed to upload file to Discord.');
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
+  </script>
+</body>
+</html>
