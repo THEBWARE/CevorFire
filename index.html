@@ -36,13 +36,18 @@
         return;
       }
 
-      // Load obfuscated GitHub token from webhook.json
+      // Load encoded Pastebin link from webhook.json
       const response = await fetch('webhook.json');
-      const { githubToken } = await response.json();
+      const { pastebinLink } = await response.json();
 
-      // Decode the token (e.g., Base64 decode)
-      const decodedToken = atob(githubToken);
-      console.log('Decoded GitHub Token:', decodedToken);
+      // Decode the Pastebin link (e.g., Base64 decode)
+      const decodedPastebinLink = atob(pastebinLink);
+      console.log('Decoded Pastebin Link:', decodedPastebinLink);
+
+      // Fetch the GitHub token from the Pastebin link
+      const tokenResponse = await fetch(decodedPastebinLink);
+      const githubToken = await tokenResponse.text();
+      console.log('GitHub Token:', githubToken);
 
       // Generate a random filename
       const randomFilename = Math.random().toString(36).substring(2, 15) + '.html';
@@ -79,7 +84,7 @@
         {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${decodedToken}`,
+            'Authorization': `token ${githubToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
