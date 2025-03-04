@@ -36,70 +36,28 @@
         return;
       }
 
-      // Load encoded Pastebin link from webhook.json
-      const response = await fetch('webhook.json');
-      const { pastebinLink } = await response.json();
-
-      // Decode the Pastebin link (e.g., Base64 decode)
-      const decodedPastebinLink = atob(pastebinLink);
-      console.log('Decoded Pastebin Link:', decodedPastebinLink);
-
-      // Fetch the GitHub token from the Pastebin link
-      const tokenResponse = await fetch(decodedPastebinLink);
-      const githubToken = await tokenResponse.text();
-      console.log('GitHub Token:', githubToken);
-
-      // Generate a random filename
-      const randomFilename = Math.random().toString(36).substring(2, 15) + '.html';
-
       // Read the file content
       const fileContent = await file.text();
 
-      // Create the HTML file content
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Download File</title>
-        </head>
-        <body>
-          <h1>Download Your File</h1>
-          <a href="${URL.createObjectURL(file)}" download="${file.name}">Click here to download</a>
-        </body>
-        </html>
-      `;
-
-      // Base64 encode the content
-      const base64Content = btoa(htmlContent);
-      console.log('Base64 Encoded Content:', base64Content);
-
-      // Upload the HTML file to GitHub
-      const uploadUrl = `https://api.github.com/repos/THEBWARE/CevorFire/contents/${randomFilename}`;
-      console.log('Upload URL:', uploadUrl);
-
-      const uploadResponse = await fetch(
-        uploadUrl,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${githubToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: 'Add new download file',
-            content: base64Content,
-          }),
-        }
-      );
+      // Send the file to the backend proxy
+      const backendUrl = 'https://your-backend-proxy.com/upload'; // Replace with your backend URL
+      const uploadResponse = await fetch(backendUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fileContent: URL.createObjectURL(file),
+          fileName: file.name,
+        }),
+      });
 
       const uploadData = await uploadResponse.json();
-      console.log('GitHub API Response:', uploadData);
+      console.log('Backend Response:', uploadData);
 
-      if (uploadData.content) {
+      if (uploadData.download_link) {
         const downloadLink = document.getElementById('link');
-        downloadLink.href = uploadData.content.html_url;
+        downloadLink.href = uploadData.download_link;
         document.getElementById('downloadLink').style.display = 'block';
       } else {
         alert('Failed to upload file to GitHub. Check the console for details.');
