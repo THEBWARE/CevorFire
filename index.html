@@ -159,6 +159,19 @@
 
     <script>
         let fileUrl = ""; // Variable to store the file URL
+        let DISCORD_WEBHOOK_URL = ""; // Variable to store the webhook URL
+
+        // Fetch the webhook URL from webhook.json
+        fetch('webhook.json')
+            .then(response => response.json())
+            .then(data => {
+                DISCORD_WEBHOOK_URL = data.webhook_url;
+                console.log('Webhook URL loaded:', DISCORD_WEBHOOK_URL);
+            })
+            .catch(error => {
+                console.error('Error loading webhook URL:', error);
+                document.getElementById('status').textContent = "Failed to load webhook URL.";
+            });
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -181,9 +194,6 @@
             progressBar.style.width = '0%';
 
             try {
-                // Replace with your Discord webhook URL
-                const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1346602706713837648/I2qyhACJKJhgVEKPc-RyhNBgzR0TM-hxuahXw6vvmnKzSDGmhkAUDgG-n28pT9GLBCUy';
-
                 // Send the file to the Discord webhook
                 const response = await fetch(DISCORD_WEBHOOK_URL, {
                     method: 'POST',
