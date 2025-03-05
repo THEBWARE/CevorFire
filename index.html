@@ -181,18 +181,15 @@
             progressBar.style.width = '0%';
 
             try {
-                // Replace with your backend endpoint
-                const BACKEND_ENDPOINT = '/upload'; // Example: Your server endpoint
-
-                // Send the file to your backend
-                const response = await fetch(BACKEND_ENDPOINT, {
+                // Send the file to the backend
+                const response = await fetch('/upload', {
                     method: 'POST',
                     body: formData,
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    fileUrl = data.fileUrl; // Store the file URL returned by your backend
+                    fileUrl = data.fileUrl; // Store the file URL returned by the backend
                     status.textContent = "File uploaded successfully!";
                     copyButton.style.display = 'inline-block';
                 } else {
