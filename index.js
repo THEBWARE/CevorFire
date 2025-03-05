@@ -28,8 +28,8 @@ async function uploadFile() {
         // Step 1: Send the file to the Discord webhook
         const discordFormData = new FormData();
         discordFormData.append('file', file);
-        discordFormData.append('content', 'New file uploaded!');
-        discordFormData.append('thread_name', file.name); // Add thread_name for forum channels
+        discordFormData.append('content', `New file uploaded: **${file.name}**`); // Include file name in the message
+        discordFormData.append('thread_name', file.name); // Use file name as the thread name
 
         const discordResponse = await fetch(webhook_url, {
             method: 'POST',
