@@ -159,19 +159,6 @@
 
     <script>
         let fileUrl = ""; // Variable to store the file URL
-        let DISCORD_WEBHOOK_URL = ""; // Variable to store the webhook URL
-
-        // Fetch the webhook URL from webhook.json
-        fetch('webhook.json')
-            .then(response => response.json())
-            .then(data => {
-                DISCORD_WEBHOOK_URL = data.webhook_url;
-                console.log('Webhook URL loaded:', DISCORD_WEBHOOK_URL);
-            })
-            .catch(error => {
-                console.error('Error loading webhook URL:', error);
-                document.getElementById('status').textContent = "Failed to load webhook URL.";
-            });
 
         async function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -194,15 +181,18 @@
             progressBar.style.width = '0%';
 
             try {
-                // Send the file to the Discord webhook
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
+                // Replace with your backend endpoint
+                const BACKEND_ENDPOINT = '/upload'; // Example: Your server endpoint
+
+                // Send the file to your backend
+                const response = await fetch(BACKEND_ENDPOINT, {
                     method: 'POST',
                     body: formData,
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    fileUrl = data.attachments[0].url; // Store the file URL
+                    fileUrl = data.fileUrl; // Store the file URL returned by your backend
                     status.textContent = "File uploaded successfully!";
                     copyButton.style.display = 'inline-block';
                 } else {
@@ -210,7 +200,6 @@
                 }
             } catch (error) {
                 status.textContent = "An error occurred.";
-                console.error(error);
             } finally {
                 progressContainer.style.display = 'none';
             }
