@@ -28,8 +28,6 @@ async function uploadFile() {
         // Send the file to the Discord webhook
         const discordFormData = new FormData();
         discordFormData.append('file', file);
-
-        // Add a message to create a thread (forum post)
         discordFormData.append('content', 'New forum post: Check out this file!');
         discordFormData.append('thread_name', file.name); // Thread name (forum post title)
 
@@ -44,6 +42,8 @@ async function uploadFile() {
             status.textContent = "File uploaded successfully!";
             copyButton.style.display = 'inline-block';
         } else {
+            const errorData = await discordResponse.json();
+            console.error(errorData);
             status.textContent = "Failed to upload file.";
         }
     } catch (error) {
