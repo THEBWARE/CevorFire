@@ -95,3 +95,62 @@ input[type="file"] {
     height: 10px;
     background-color: #7289da;
     border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+/* Status Message */
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Copy Button */
+.copy-button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #008CBA;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: none;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(0, 140, 186, 0.3);
+}
+
+.copy-button:hover {
+    background-color: #007B9E;
+    transform: scale(1.05);
+}
+
+/* TOS Button */
+.tos-button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+}
+
+.tos-button:hover {
+    background-color: #e64a19;
+    transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
