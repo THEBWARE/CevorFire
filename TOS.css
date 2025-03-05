@@ -1,0 +1,69 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    overflow: hidden;
+}
+
+/* TOS Container */
+.tos-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+h1 {
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: -1px;
+}
+
+p {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+ul {
+    text-align: left;
+    margin: 20px 0;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* Back Button */
+.back-button {
+    margin-top: 25px;
+    padding: 15px 30px;
+    background-color: #7289da;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(114, 137, 218, 0.3);
+}
+
+.back-button:hover {
+    background-color: #5b6eae;
+    transform: scale(1.05);
+}
