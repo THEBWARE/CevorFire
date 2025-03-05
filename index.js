@@ -25,27 +25,66 @@ async function uploadFile() {
         const response = await fetch('webhook.json');
         const { webhook_url } = await response.json();
 
-        // Send the file to the Discord webhook
+        // Step 1: Send the file to the Discord webhook
         const discordFormData = new FormData();
         discordFormData.append('file', file);
-        discordFormData.append('content', 'New forum post: Check out this file!');
-        discordFormData.append('thread_name', file.name); // Thread name (forum post title)
+        discordFormData.append('content', 'New file uploaded!');
 
         const discordResponse = await fetch(webhook_url, {
             method: 'POST',
             body: discordFormData,
         });
 
-        if (discordResponse.ok) {
-            const data = await discordResponse.json();
-            fileUrl = data.attachments[0].url; // Get the file URL from the Discord response
-            status.textContent = "File uploaded successfully!";
-            copyButton.style.display = 'inline-block';
-        } else {
+        if (!discordResponse.ok) {
             const errorData = await discordResponse.json();
             console.error(errorData);
             status.textContent = "Failed to upload file.";
+            return;
         }
+
+        const discordData = await discordResponse.json();
+        fileUrl = discordData.attachments[0].url; // Get the file URL from the Discord response
+
+        // Step 2: Create a thread in the forum channel
+        const channelId = 'YOUR_FORUM_CHANNEL_ID'; // Replace with your forum channel ID
+        const botToken = 'YOUR_BOT_TOKEN'; // Replace with your bot token
+
+        const threadResponse = await fetch(`https://discord.com/api/v10/channels/${channelId}/threads`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bot ${botToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: file.name, // Thread name (forum post title)
+                auto_archive_duration: 60, // Thread auto-archive duration (in minutes)
+                message: {
+                    content: `File uploaded: ${file.name}`,
+                },
+            }),
+        });
+
+        if (!threadResponse.ok) {
+            const threadErrorData = await threadResponse.json();
+            console.error(threadErrorData);
+            status.textContent = "Failed to create forum post.";
+            return;
+        }
+
+        const threadData = await threadResponse.json();
+        const threadId = threadData.id; // Get the thread ID
+
+        // Step 3: Move the file message to the thread (optional)
+        const messageId = discordData.id; // Get the message ID of the uploaded file
+        await fetch(`https://discord.com/api/v10/channels/${threadId}/messages/${messageId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bot ${botToken}`,
+            },
+        });
+
+        status.textContent = "File uploaded successfully and forum post created!";
+        copyButton.style.display = 'inline-block';
     } catch (error) {
         console.error(error);
         status.textContent = "An error occurred.";
