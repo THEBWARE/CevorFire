@@ -21,24 +21,33 @@ async function uploadFile() {
     progressBar.style.width = '0%';
 
     try {
-        // Replace with your backend endpoint
-        const BACKEND_ENDPOINT = '/upload'; // Example: Your server endpoint
+        // Load the webhook URL from webhook.json
+        const response = await fetch('webhook.json');
+        const { webhook_url } = await response.json();
 
-        // Send the file to your backend
-        const response = await fetch(BACKEND_ENDPOINT, {
+        // Send the file to the Discord webhook
+        const discordFormData = new FormData();
+        discordFormData.append('file', file);
+
+        // Add a message to create a thread (forum post)
+        discordFormData.append('content', 'New forum post: Check out this file!');
+        discordFormData.append('thread_name', file.name); // Thread name (forum post title)
+
+        const discordResponse = await fetch(webhook_url, {
             method: 'POST',
-            body: formData,
+            body: discordFormData,
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            fileUrl = data.fileUrl; // Store the file URL returned by your backend
+        if (discordResponse.ok) {
+            const data = await discordResponse.json();
+            fileUrl = data.attachments[0].url; // Get the file URL from the Discord response
             status.textContent = "File uploaded successfully!";
             copyButton.style.display = 'inline-block';
         } else {
             status.textContent = "Failed to upload file.";
         }
     } catch (error) {
+        console.error(error);
         status.textContent = "An error occurred.";
     } finally {
         progressContainer.style.display = 'none';
