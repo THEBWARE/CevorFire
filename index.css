@@ -126,6 +126,25 @@ input[type="file"] {
     transform: scale(1.05);
 }
 
+/* TOS Button */
+.tos-button {
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+}
+
+.tos-button:hover {
+    background-color: #e64a19;
+    transform: scale(1.05);
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
