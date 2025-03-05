@@ -12,7 +12,7 @@ const PORT = 3000;
 const upload = multer({ dest: 'uploads/' });
 
 // Replace with your Discord webhook URL
-const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL';
+const DISCORD_WEBHOOK_URL = '{https://discord.com/api/webhooks/1346602706713837648/I2qyhACJKJhgVEKPc-RyhNBgzR0TM-hxuahXw6vvmnKzSDGmhkAUDgG-n28pT9GLBCUy"}';
 
 // Serve static files from the "public" directory
 app.use(express.static('public'));
